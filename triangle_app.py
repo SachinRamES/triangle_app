@@ -1,15 +1,13 @@
 import streamlit as st
 import cv2
-import pandas as pd
 import numpy as np
 from PIL import Image
-import io
 
 # Function to extract triangle sides from image
 def extract_triangle_sides(image):
     # Convert image to OpenCV format
-    img = pd.DataFrame(np.array(image.convert('RGB')))
-    img_gray = cv2.cvtColor(img.values, cv2.COLOR_RGB2GRAY)
+    img = np.array(image.convert('RGB'))
+    img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
     # Edge detection
     edges = cv2.Canny(img_gray, 50, 150)
@@ -32,7 +30,7 @@ def extract_triangle_sides(image):
     
     # Calculate side lengths
     def distance(p1, p2):
-        return pd.Series([(p2[0] - p1[0])**2 + (p2[1] - p1[1])**2]).sqrt().values[0]
+        return np.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
     
     a = distance(vertices[0], vertices[1])
     b = distance(vertices[1], vertices[2])
@@ -45,23 +43,23 @@ def calculate_trigonometry(a, b, c):
     def cos_angle(a, b, c):
         return (a**2 + b**2 - c**2) / (2 * a * b)
     
-    A_rad = pd.Series([cos_angle(b, c, a)]).apply(lambda x: pd.np.arccos(x)).values[0]
-    B_rad = pd.Series([cos_angle(a, c, b)]).apply(lambda x: pd.np.arccos(x)).values[0]
-    C_rad = pd.Series([cos_angle(a, b, c)]).apply(lambda x: pd.np.arccos(x)).values[0]
+    A_rad = np.arccos(cos_angle(b, c, a))
+    B_rad = np.arccos(cos_angle(a, c, b))
+    C_rad = np.arccos(cos_angle(a, b, c))
     
     return {
-        'A_deg': pd.Series([A_rad]).apply(lambda x: pd.np.degrees(x)).values[0],
-        'B_deg': pd.Series([B_rad]).apply(lambda x: pd.np.degrees(x)).values[0],
-        'C_deg': pd.Series([C_rad]).apply(lambda x: pd.np.degrees(x)).values[0],
-        'sin_A': pd.Series([A_rad]).apply(lambda x: pd.np.sin(x)).values[0],
-        'sin_B': pd.Series([B_rad]).apply(lambda x: pd.np.sin(x)).values[0],
-        'sin_C': pd.Series([C_rad]).apply(lambda x: pd.np.sin(x)).values[0],
-        'cos_A': pd.Series([A_rad]).apply(lambda x: pd.np.cos(x)).values[0],
-        'cos_B': pd.Series([B_rad]).apply(lambda x: pd.np.cos(x)).values[0],
-        'cos_C': pd.Series([C_rad]).apply(lambda x: pd.np.cos(x)).values[0],
-        'tan_A': pd.Series([A_rad]).apply(lambda x: pd.np.tan(x)).values[0],
-        'tan_B': pd.Series([B_rad]).apply(lambda x: pd.np.tan(x)).values[0],
-        'tan_C': pd.Series([C_rad]).apply(lambda x: pd.np.tan(x)).values[0]
+        'A_deg': np.degrees(A_rad),
+        'B_deg': np.degrees(B_rad),
+        'C_deg': np.degrees(C_rad),
+        'sin_A': np.sin(A_rad),
+        'sin_B': np.sin(B_rad),
+        'sin_C': np.sin(C_rad),
+        'cos_A': np.cos(A_rad),
+        'cos_B': np.cos(B_rad),
+        'cos_C': np.cos(C_rad),
+        'tan_A': np.tan(A_rad),
+        'tan_B': np.tan(B_rad),
+        'tan_C': np.tan(C_rad)
     }
 
 # Streamlit app
